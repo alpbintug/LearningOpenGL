@@ -1,0 +1,8 @@
+﻿Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwInit için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwTerminate için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwCreateWindow için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwWindowShouldClose için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwPollEvents için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwMakeContextCurrent için main işlevinde başvuruldu
+Application.obj : error LNK2019: çözümlenmemiş dış sembol glfwSwapBuffers için main işlevinde başvuruldu
+D:\Okul\GitHub Material\VisualStudioProjects\LearningOpenGL\x64\Debug\LearningOpenGL.exe : fatal error LNK1120: 7 çözümlenmemiş dışlar

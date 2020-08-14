@@ -1,2 +1,2 @@
-﻿LINK : warning LNK4098: defaultlib 'MSVCRT' diğer kitaplıkların kullanımı ile çakışıyor; /NODEFAULTLIB:library kullanın
+﻿  Application.cpp
   LearningOpenGL.vcxproj -> D:\Okul\GitHub Material\VisualStudioProjects\LearningOpenGL\Debug\LearningOpenGL.exe
