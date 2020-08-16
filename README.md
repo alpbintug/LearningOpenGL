@@ -1,4 +1,3 @@
 # LearningOpenGL
 
-Codes that I write to learn how OpenGL works.
-This repo will be updated later.
+Training OpenGL functions and learning how to generate math-based graphics on GPU.
