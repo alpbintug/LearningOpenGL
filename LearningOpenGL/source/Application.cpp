@@ -114,8 +114,13 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 640, "Lil Window", NULL, NULL);
+    glfwSwapInterval(1); //FPS Synch
     if (!window)
     {
         glfwTerminate();
@@ -143,6 +148,11 @@ int main(void)
         0,1,2,
         2,3,0
     };
+
+    //Creating vertex array object and binding it
+    unsigned int vertexArrayObject;
+    GLCall(glGenVertexArrays(1, &vertexArrayObject));
+    GLCall(glBindVertexArray(vertexArrayObject));
 
     //Creating vertex buffer
     unsigned int vertexBuffer;
@@ -174,6 +184,10 @@ int main(void)
     float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
     glUniform4f(uniformLocation,r,g,b, 1.0f);
 
+    GLCall(glBindVertexArray(0));
+    GLCall(glUseProgram(0));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER,0));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0));
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -181,13 +195,18 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+
+        GLCall(glUseProgram(shader));
+        GLCall(glBindVertexArray(vertexArrayObject));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject));
+
         //Creating some kind of color shifting animation
         glUniform4f(uniformLocation, r, g, b, 1.0f);
 
         //Calling the macro defined function to check if error occured
         //Clearing all errors to check if the drawing function creates any errors,
         //DRAWING
-        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_UNSIGNED_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies)/sizeof(unsigned int), GL_UNSIGNED_INT, nullptr));
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
