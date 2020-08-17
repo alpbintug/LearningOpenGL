@@ -16,7 +16,7 @@ static ShaderCodes ParseShaderSource(const std::string& filepath)
 {
     std::ifstream stream(filepath);
     std::string line;
-    std::stringstream buffer[2]; // 0-> vertex, 1-> fragment
+    std::stringstream shaderBuffer[2]; // 0-> vertex, 1-> fragment
 
     enum class ShaderType
     {
@@ -40,10 +40,10 @@ static ShaderCodes ParseShaderSource(const std::string& filepath)
         }
         else
         {
-            buffer[(int)curType] << line << '\n';
+            shaderBuffer[(int)curType] << line << '\n';
         }
     }
-    return { buffer[0].str(),buffer[1].str() };
+    return { shaderBuffer[0].str(),shaderBuffer[1].str() };
 }
 static unsigned int CompileShader(unsigned int type ,const std::string& source)
 {
@@ -95,7 +95,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Triangleeee", NULL, NULL);
+    window = glfwCreateWindow(640, 640, "Lil Window", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -112,14 +112,32 @@ int main(void)
     }
 
     //GENERATING BUFFER AND POSITIONS FOR OUR VERTICIES OF THE TRIANGLE
-    float positions[6] = { -0.5f, -0.5f, 0.0f, 0.5f,0.5f,-0.5f };
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    float positions[] = 
+    {   -0.5f, -0.5f,
+        0.5f,-0.5f,
+        0.5f, 0.5f,
+        -0.5f, 0.5f        
+    };
+    unsigned int indicies[] =
+    {
+        0,1,2,
+        2,3,0
+    };
+
+    //Creating vertex buffer
+    unsigned int vertexBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    //Creating index buffer
+    unsigned int indexBufferObject;
+    glGenBuffers(1, &indexBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indicies, GL_STATIC_DRAW);
 
     //Reading source code for shaders
     ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
@@ -136,8 +154,8 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //DRAWING A TRIANGLE
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //DRAWING
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
