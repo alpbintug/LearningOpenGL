@@ -6,6 +6,18 @@
 #include <string> 
 #include <sstream>
 
+static void GLClearError()
+{
+    while (glGetError()!= GL_NO_ERROR);
+}
+static void GLCheckError()
+{
+    GLenum error;
+    while (error = glGetError())
+    {
+        std::cout << "---OpenGL error---" << std::endl << "Error code: " << error << std::endl;
+    }
+}
 struct ShaderCodes
 {
     std::string vertexSource;
@@ -137,7 +149,7 @@ int main(void)
     unsigned int indexBufferObject;
     glGenBuffers(1, &indexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indicies, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
     //Reading source code for shaders
     ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
@@ -154,9 +166,12 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //Clearing all errors to check if the drawing function creates any errors
+        GLClearError();
         //DRAWING
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
+        glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_UNSIGNED_INT, nullptr);
+        //Checking if any errors are caused by drawing function
+        GLCheckError();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
