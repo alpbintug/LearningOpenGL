@@ -1,22 +1,28 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <fstream>
 #include <string> 
 #include <sstream>
 
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCall(x) GLClearError();\
+    x;\
+    ASSERT(GLLogCall());
+
 static void GLClearError()
 {
     while (glGetError()!= GL_NO_ERROR);
 }
-static void GLCheckError()
+static bool GLLogCall()
 {
     GLenum error;
-    while (error = glGetError())
+    if (error = glGetError())
     {
         std::cout << "---OpenGL error---" << std::endl << "Error code: " << error << std::endl;
+        return false;
     }
+    return true;
 }
 struct ShaderCodes
 {
@@ -166,12 +172,10 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //Clearing all errors to check if the drawing function creates any errors
-        GLClearError();
+        //Calling the macro defined function to check if error occured
+        //Clearing all errors to check if the drawing function creates any errors,
         //DRAWING
-        glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_UNSIGNED_INT, nullptr);
-        //Checking if any errors are caused by drawing function
-        GLCheckError();
+        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_INT, nullptr));
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
