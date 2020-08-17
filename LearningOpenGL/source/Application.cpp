@@ -123,7 +123,7 @@ int main(void)
     }
 
     /* Make the window's context current */
-    GLCall(glfwMakeContextCurrent(window));
+    glfwMakeContextCurrent(window);
 
     if (glewInit() != GLEW_OK)
     {
@@ -146,18 +146,18 @@ int main(void)
 
     //Creating vertex buffer
     unsigned int vertexBuffer;
-    GLCall(glGenBuffers(1, &vertexBuffer));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
 
-    GLCall(glEnableVertexAttribArray(0));
-    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     //Creating index buffer
     unsigned int indexBufferObject;
-    GLCall(glGenBuffers(1, &indexBufferObject));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject));
-    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW));
+    glGenBuffers(1, &indexBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
     //Reading source code for shaders
     ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
@@ -165,28 +165,67 @@ int main(void)
 
     //Creating shaders
     unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
-    GLCall(glUseProgram(shader));
+    glUseProgram(shader);
+
+    //Creating uniform
+    int uniformLocation = glGetUniformLocation(shader, "u_Color");
+    ASSERT(uniformLocation != -1);
+    float r = 1.0f, g = 0.5f, b = 0.0f;
+    float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
+    glUniform4f(uniformLocation,r,g,b, 1.0f);
 
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        //Creating some kind of color shifting animation
+        glUniform4f(uniformLocation, r, g, b, 1.0f);
 
         //Calling the macro defined function to check if error occured
         //Clearing all errors to check if the drawing function creates any errors,
         //DRAWING
-        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_UNSIGNED_INT, nullptr));
         /* Swap front and back buffers */
-        GLCall(glfwSwapBuffers(window));
+        glfwSwapBuffers(window);
+
+        r += rChange;
+        g += gChange;
+        b += bChange;
+
+        if (r >= 1)
+        {
+            rChange = -0.01f;
+        }
+        else if (r <= 0)
+        {
+            rChange = 0.01f;
+        }
+        if (g >= 1)
+        {
+            gChange = -0.01f;
+        }
+        else if (g <= 0)
+        {
+            gChange = 0.01f;
+        }
+        if (b >= 1)
+        {
+            bChange = -0.01f;
+        }
+        else if (b <= 0)
+        {
+            bChange = 0.01f;
+        }
 
         /* Poll for and process events */
-        GLCall(glfwPollEvents());
+        glfwPollEvents();
     }
 
-    GLCall(glDeleteProgram(shader));
+    glDeleteProgram(shader);
 
-    GLCall(glfwTerminate());
+    glfwTerminate();
     return 0;
 }
