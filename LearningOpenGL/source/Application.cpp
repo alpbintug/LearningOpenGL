@@ -123,7 +123,7 @@ int main(void)
     }
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    GLCall(glfwMakeContextCurrent(window));
 
     if (glewInit() != GLEW_OK)
     {
@@ -146,18 +146,18 @@ int main(void)
 
     //Creating vertex buffer
     unsigned int vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+    GLCall(glGenBuffers(1, &vertexBuffer));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    GLCall(glEnableVertexAttribArray(0));
+    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
 
     //Creating index buffer
     unsigned int indexBufferObject;
-    glGenBuffers(1, &indexBufferObject);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+    GLCall(glGenBuffers(1, &indexBufferObject));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject));
+    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW));
 
     //Reading source code for shaders
     ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
@@ -165,28 +165,28 @@ int main(void)
 
     //Creating shaders
     unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
-    glUseProgram(shader);
+    GLCall(glUseProgram(shader));
 
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
         //Calling the macro defined function to check if error occured
         //Clearing all errors to check if the drawing function creates any errors,
         //DRAWING
         GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies), GL_INT, nullptr));
         /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        GLCall(glfwSwapBuffers(window));
 
         /* Poll for and process events */
-        glfwPollEvents();
+        GLCall(glfwPollEvents());
     }
 
-    glDeleteProgram(shader);
+    GLCall(glDeleteProgram(shader));
 
-    glfwTerminate();
+    GLCall(glfwTerminate());
     return 0;
 }
