@@ -4,28 +4,10 @@
 #include <fstream>
 #include <string> 
 #include <sstream>
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__));
-
-static void GLClearError()
-{
-    while (glGetError()!= GL_NO_ERROR);
-}
-static bool GLLogCall(const char* function, const char* file, unsigned int line)
-{
-    GLenum error;
-    if (error = glGetError())
-    {
-        std::cout << "---OpenGL error---" << std::endl << "Error code: " << error << std::endl
-            << "Error occured in function " << function << std::endl 
-            << "File: " << file << ", Line: " << line << std::endl;
-        return false;
-    }
-    return true;
-}
 struct ShaderCodes
 {
     std::string vertexSource;
@@ -135,116 +117,110 @@ int main(void)
         std::cout << "Cannot init the glew lib" << std::endl;
         return -1;
     }
-
-    //GENERATING BUFFER AND POSITIONS FOR OUR VERTICIES OF THE TRIANGLE
-    float positions[] = 
-    {   -0.5f, -0.5f,
-        0.5f,-0.5f,
-        0.5f, 0.5f,
-        -0.5f, 0.5f        
-    };
-    unsigned int indicies[] =
     {
-        0,1,2,
-        2,3,0
-    };
+        //GENERATING BUFFER AND POSITIONS FOR OUR VERTICIES OF THE TRIANGLE
+        float positions[] = 
+        {   -0.5f, -0.5f,
+            0.5f,-0.5f,
+            0.5f, 0.5f,
+            -0.5f, 0.5f        
+        };
+        unsigned int indicies[] =
+        {
+            0,1,2,
+            2,3,0
+        };
 
-    //Creating vertex array object and binding it
-    unsigned int vertexArrayObject;
-    GLCall(glGenVertexArrays(1, &vertexArrayObject));
-    GLCall(glBindVertexArray(vertexArrayObject));
-
-    //Creating vertex buffer
-    unsigned int vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-
-    //Creating index buffer
-    unsigned int indexBufferObject;
-    glGenBuffers(1, &indexBufferObject);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
-
-    //Reading source code for shaders
-    ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
-
-
-    //Creating shaders
-    unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
-    glUseProgram(shader);
-
-    //Creating uniform
-    int uniformLocation = glGetUniformLocation(shader, "u_Color");
-    ASSERT(uniformLocation != -1);
-    float r = 1.0f, g = 0.5f, b = 0.0f;
-    float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
-    glUniform4f(uniformLocation,r,g,b, 1.0f);
-
-    GLCall(glBindVertexArray(0));
-    GLCall(glUseProgram(0));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER,0));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0));
-
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-
-
-        GLCall(glUseProgram(shader));
+        //Creating vertex array object and binding it
+        unsigned int vertexArrayObject;
+        GLCall(glGenVertexArrays(1, &vertexArrayObject));
         GLCall(glBindVertexArray(vertexArrayObject));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject));
 
-        //Creating some kind of color shifting animation
-        glUniform4f(uniformLocation, r, g, b, 1.0f);
+        //Creating vertex buffer
+        VertexBuffer vertexBuffer(positions, sizeof(positions));
 
-        //Calling the macro defined function to check if error occured
-        //Clearing all errors to check if the drawing function creates any errors,
-        //DRAWING
-        GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies)/sizeof(unsigned int), GL_UNSIGNED_INT, nullptr));
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-        r += rChange;
-        g += gChange;
-        b += bChange;
+        //Creating index buffer
+        IndexBuffer indexBufferObject(indicies, sizeof(indicies) / sizeof(unsigned int));
 
-        if (r >= 1)
+        //Reading source code for shaders
+        ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
+
+
+        //Creating shaders
+        unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
+        glUseProgram(shader);
+
+        //Creating uniform
+        int uniformLocation = glGetUniformLocation(shader, "u_Color");
+        ASSERT(uniformLocation != -1);
+        float r = 1.0f, g = 0.5f, b = 0.0f;
+        float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
+        glUniform4f(uniformLocation,r,g,b, 1.0f);
+
+        GLCall(glBindVertexArray(0));
+        GLCall(glUseProgram(0));
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER,0));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0));
+
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window))
         {
-            rChange = -0.01f;
-        }
-        else if (r <= 0)
-        {
-            rChange = 0.01f;
-        }
-        if (g >= 1)
-        {
-            gChange = -0.01f;
-        }
-        else if (g <= 0)
-        {
-            gChange = 0.01f;
-        }
-        if (b >= 1)
-        {
-            bChange = -0.01f;
-        }
-        else if (b <= 0)
-        {
-            bChange = 0.01f;
+            /* Render here */
+            glClear(GL_COLOR_BUFFER_BIT);
+
+
+            GLCall(glUseProgram(shader));
+            GLCall(glBindVertexArray(vertexArrayObject));
+            indexBufferObject.Bind();
+
+            //Creating some kind of color shifting animation
+            glUniform4f(uniformLocation, r, g, b, 1.0f);
+
+            //Calling the macro defined function to check if error occured
+            //Clearing all errors to check if the drawing function creates any errors,
+            //DRAWING
+            GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies)/sizeof(unsigned int), GL_UNSIGNED_INT, nullptr));
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            r += rChange;
+            g += gChange;
+            b += bChange;
+
+            if (r >= 1)
+            {
+                rChange = -0.01f;
+            }
+            else if (r <= 0)
+            {
+                rChange = 0.01f;
+            }
+            if (g >= 1)
+            {
+                gChange = -0.01f;
+            }
+            else if (g <= 0)
+            {
+                gChange = 0.01f;
+            }
+            if (b >= 1)
+            {
+                bChange = -0.01f;
+            }
+            else if (b <= 0)
+            {
+                bChange = 0.01f;
+            }
+
+            /* Poll for and process events */
+            glfwPollEvents();
         }
 
-        /* Poll for and process events */
-        glfwPollEvents();
+        glDeleteProgram(shader);
     }
-
-    glDeleteProgram(shader);
-
     glfwTerminate();
     return 0;
 }
