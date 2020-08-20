@@ -16,6 +16,7 @@ Codes are written in ***C++***, on ***Visual Studio 2019*** to not encounter pro
 ## Visual Works Done
 
 - Created some kind of color shifting animation
+
 ![Colors are so cute](https://media.giphy.com/media/UQ6tOPf70ZdzxH8AAJ/giphy.gif)
 
 ## Contributing
