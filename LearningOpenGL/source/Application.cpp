@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 struct ShaderCodes
 {
@@ -136,11 +137,13 @@ int main(void)
         GLCall(glGenVertexArrays(1, &vertexArrayObject));
         GLCall(glBindVertexArray(vertexArrayObject));
 
-        //Creating vertex buffer
+        //Creating vertex thingies
+        VertexArray vertexArray;
         VertexBuffer vertexBuffer(positions, sizeof(positions));
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+        VertexBufferLayout vertexBufferLayout;
+        vertexBufferLayout.Push<float>(2);
+        vertexArray.AddBuffer(vertexBuffer, vertexBufferLayout);
+        
 
         //Creating index buffer
         IndexBuffer indexBufferObject(indicies, sizeof(indicies) / sizeof(unsigned int));
@@ -173,7 +176,7 @@ int main(void)
 
 
             GLCall(glUseProgram(shader));
-            GLCall(glBindVertexArray(vertexArrayObject));
+            vertexArray.Bind();
             indexBufferObject.Bind();
 
             //Creating some kind of color shifting animation
