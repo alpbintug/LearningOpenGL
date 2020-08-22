@@ -133,9 +133,6 @@ int main(void)
         };
 
         //Creating vertex array object and binding it
-        unsigned int vertexArrayObject;
-        GLCall(glGenVertexArrays(1, &vertexArrayObject));
-        GLCall(glBindVertexArray(vertexArrayObject));
 
         //Creating vertex thingies
         VertexArray vertexArray;
@@ -163,7 +160,7 @@ int main(void)
         float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
         glUniform4f(uniformLocation,r,g,b, 1.0f);
 
-        GLCall(glBindVertexArray(0));
+        vertexArray.Unbind();
         GLCall(glUseProgram(0));
         GLCall(glBindBuffer(GL_ARRAY_BUFFER,0));
         GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0));
