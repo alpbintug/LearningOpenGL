@@ -8,6 +8,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
+#include "Shader.h"
 
 
 int main(void)
@@ -66,25 +67,20 @@ int main(void)
         //Creating index buffer
         IndexBuffer indexBufferObject(indicies, sizeof(indicies) / sizeof(unsigned int));
 
-        //Reading source code for shaders
-        ShaderCodes source = ParseShaderSource("resources/shaders/Basic.shader");
-
-
-        //Creating shaders
-        unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
-        glUseProgram(shader);
-
-        //Creating uniform
-        int uniformLocation = glGetUniformLocation(shader, "u_Color");
-        ASSERT(uniformLocation != -1);
-        float r = 1.0f, g = 0.5f, b = 0.0f;
+        //Creating and binding shader
+        Shader shader("resources/shaders/Basic.shader");
+        shader.Bind();
+        //Color settings
+        float r = 1.0f, g = 0.0f, b = 0.3f, a=1.0f;
         float rChange = 0.01f, gChange = 0.01f, bChange = 0.01f;
-        glUniform4f(uniformLocation,r,g,b, 1.0f);
+        //Creating uniform with colors
+        shader.SetUniform4f("u_Color", r, g, b, a);
+
 
         vertexArray.Unbind();
-        GLCall(glUseProgram(0));
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER,0));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0));
+        vertexBuffer.Unbind();
+        indexBufferObject.Unbind();
+        shader.Unbind();
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
@@ -92,13 +88,12 @@ int main(void)
             /* Render here */
             glClear(GL_COLOR_BUFFER_BIT);
 
-
-            GLCall(glUseProgram(shader));
+            shader.Bind();
             vertexArray.Bind();
             indexBufferObject.Bind();
 
             //Creating some kind of color shifting animation
-            glUniform4f(uniformLocation, r, g, b, 1.0f);
+            shader.SetUniform4f("u_Color", r, g, b, a);
 
             //Calling the macro defined function to check if error occured
             //Clearing all errors to check if the drawing function creates any errors,
@@ -139,8 +134,6 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
         }
-
-        glDeleteProgram(shader);
     }
     glfwTerminate();
     return 0;
