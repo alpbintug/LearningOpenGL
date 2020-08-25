@@ -6,6 +6,7 @@
 #include <sstream>
 #include "Renderer.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -82,6 +83,7 @@ int main(void)
         indexBufferObject.Unbind();
         shader.Unbind();
 
+        Renderer renderer;
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
@@ -89,16 +91,11 @@ int main(void)
             glClear(GL_COLOR_BUFFER_BIT);
 
             shader.Bind();
-            vertexArray.Bind();
-            indexBufferObject.Bind();
-
             //Creating some kind of color shifting animation
             shader.SetUniform4f("u_Color", r, g, b, a);
 
-            //Calling the macro defined function to check if error occured
-            //Clearing all errors to check if the drawing function creates any errors,
             //DRAWING
-            GLCall(glDrawElements(GL_TRIANGLES, sizeof(indicies)/sizeof(unsigned int), GL_UNSIGNED_INT, nullptr));
+            renderer.Draw(vertexArray, indexBufferObject, shader);
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
 
