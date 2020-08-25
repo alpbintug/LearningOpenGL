@@ -25,5 +25,7 @@ uniform sampler2D u_Texture;
 void main()
 {
 	vec4 texColor = texture(u_Texture, v_TexCoord);
+
+	//This line of code WILL breat everything lol just remove it
    color = texColor * u_Color;
 };

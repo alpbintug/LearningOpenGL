@@ -19,6 +19,11 @@ Codes are written in ***C++***, on ***Visual Studio 2019*** to not encounter pro
 
 ![Colors are so cute](https://media.giphy.com/media/UQ6tOPf70ZdzxH8AAJ/giphy.gif)
 
+
+- Added textures
+
+![Pepe the Colorful Frog](https://media.giphy.com/media/MZYC0usLeOZAArmFse/giphy.gif)
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
