@@ -10,6 +10,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 int main(void)
@@ -44,10 +45,10 @@ int main(void)
     {
         //GENERATING BUFFER AND POSITIONS FOR OUR VERTICIES OF THE TRIANGLE
         float positions[] = 
-        {   -0.5f, -0.5f,
-            0.5f,-0.5f,
-            0.5f, 0.5f,
-            -0.5f, 0.5f        
+        {   -0.5f, -0.5f, 0.0f, 0.0f,
+            0.5f,-0.5f, 1.0f, 0.0f,
+            0.5f, 0.5f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.0f, 1.0f        
         };
         unsigned int indicies[] =
         {
@@ -55,12 +56,15 @@ int main(void)
             2,3,0
         };
 
+        GLCall(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
+        GLCall(glEnable(GL_BLEND));
         //Creating vertex array object and binding it
 
         //Creating vertex thingies
         VertexArray vertexArray;
         VertexBuffer vertexBuffer(positions, sizeof(positions));
         VertexBufferLayout vertexBufferLayout;
+        vertexBufferLayout.Push<float>(2);
         vertexBufferLayout.Push<float>(2);
         vertexArray.AddBuffer(vertexBuffer, vertexBufferLayout);
         
@@ -77,6 +81,9 @@ int main(void)
         //Creating uniform with colors
         shader.SetUniform4f("u_Color", r, g, b, a);
 
+        Texture texture("resources/Textures/tex_pepe.png");
+        texture.Bind();
+        shader.SetUniform1i("u_Texture", 0);
 
         vertexArray.Unbind();
         vertexBuffer.Unbind();
